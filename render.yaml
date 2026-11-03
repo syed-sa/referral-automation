@@ -1,0 +1,36 @@
+# Render Blueprint. Secrets are marked sync:false: enter them in the Render dashboard,
+# never in this file.
+services:
+  - type: web
+    name: referral-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: AUTO_MIGRATE            # applies pending migrations on start (uses MIGRATION_DATABASE_URL)
+        value: "true"
+      - key: DATABASE_URL            # Supabase pooler (transaction mode, port 6543)
+        sync: false
+      - key: MIGRATION_DATABASE_URL  # Supabase direct connection (port 5432)
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: ALLOWED_ORIGINS         # exact Vercel origin, e.g. https://your-app.vercel.app
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URL     # https://<render-host>/oauth/gmail/callback
+        sync: false
+      - key: TOKEN_ENCRYPTION_KEY
+        sync: false

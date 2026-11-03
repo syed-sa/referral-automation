@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS workflow_events;
+DROP TABLE IF EXISTS job_contacts;
+DROP TABLE IF EXISTS contacts;
+DROP TABLE IF EXISTS jobs;
+DROP TABLE IF EXISTS companies;
+DROP TABLE IF EXISTS users;
