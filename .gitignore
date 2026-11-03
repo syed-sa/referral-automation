@@ -36,7 +36,7 @@ go.work.sum
 /backend/bin/
 /backend/tmp/
 
-# Node / frontend (later)
+# Node / frontend
 node_modules/
 dist/
 .vite/

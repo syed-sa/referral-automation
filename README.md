@@ -2,7 +2,7 @@
 
 A multi-tenant tracker for LinkedIn referral outreach. You add companies, jobs and contacts, link contacts to jobs, and track every referral request through a workflow. **There is no LinkedIn automation or scraping**: you do the LinkedIn actions yourself and the app tracks them.
 
-The backend is complete (all five phases). The frontend is not built yet.
+The backend (Go, `backend/`) is complete for all five phases and the frontend (React, `frontend/`) is built. This is a monorepo: the API deploys to Render and the frontend to Vercel, independently.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
@@ -16,11 +16,12 @@ The backend is complete (all five phases). The frontend is not built yet.
 
 ## Stack
 
-Go, Chi, pgx, sqlc, golang-migrate, slog. Supabase PostgreSQL and Supabase Auth. Backend on Render, frontend (later) on Vercel.
+Go, Chi, pgx, sqlc, golang-migrate, slog. Supabase PostgreSQL and Supabase Auth. Backend on Render. Frontend: React, TypeScript, Vite, Tailwind, shadcn/ui, TanStack Query, Supabase Auth, on Vercel (see `frontend/README.md`).
 
 ## Layout
 
 ```
+frontend/            React app (Vercel)
 backend/
   cmd/api            HTTP server
   cmd/migrate        migration runner (up / down / version)
@@ -97,3 +98,4 @@ ADDED -> INVITATION_PENDING -> CONNECTED -> MESSAGE_READY -> MESSAGE_SENT -> AWA
 - `docs/security.md`
 - `docs/gmail.md` (Google setup, matching rules, the parser sample request)
 - `docs/deployment.md` (Supabase, Render, Vercel)
+- `frontend/README.md` (local run, environment variables, Vercel settings)

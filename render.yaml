@@ -9,6 +9,9 @@ services:
     plan: free
     healthCheckPath: /healthz
     autoDeploy: true
+    buildFilter:                 # monorepo: only backend changes redeploy the API
+      paths:
+        - backend/**
     envVars:
       - key: APP_ENV
         value: production

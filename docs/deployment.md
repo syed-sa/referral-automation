@@ -34,9 +34,27 @@ Supabase (database and auth), Render (Go API), Vercel (frontend, later).
 
 Notes: the free Render plan sleeps when idle, so the first request after a pause is slow. Rate limits are per instance and in memory, which is correct for the single instance this app runs.
 
-## 3. Vercel (frontend, when it exists)
+## 3. Vercel (frontend)
 
-Environment variables: `VITE_API_URL` (the Render URL), `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. The frontend sends `Authorization: Bearer <supabase access token>` to the API. After deployment, put its exact origin into `ALLOWED_ORIGINS` and `FRONTEND_URL` on Render.
+The repo is a monorepo, so Vercel must build only the `frontend` folder.
+
+1. Vercel, Add New Project, import the repo.
+2. **Root Directory: `frontend`.** Framework preset Vite is detected; `frontend/vercel.json` sets `npm ci`, `npm run build`, output `dist`, the single-page-app rewrite (deep links such as `/referrals/<id>` work on refresh) and an ignore rule so backend-only commits do not trigger a frontend build.
+3. Environment variables (Production and Preview):
+
+| Variable | Value |
+| --- | --- |
+| `VITE_API_URL` | the Render service URL, e.g. `https://referral-api.onrender.com` (no trailing slash, no `/api/v1`) |
+| `VITE_SUPABASE_URL` | `https://<ref>.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | the Supabase **anon** (publishable) key. Never the service-role key |
+
+These are public by design: Vite embeds them in the browser bundle. Row access is protected by the API verifying the user's JWT, not by hiding these values.
+
+4. Deploy, then close the loop on Render: set `ALLOWED_ORIGINS` and `FRONTEND_URL` to the exact Vercel origin (for example `https://your-app.vercel.app`, no trailing slash) and redeploy the API. Until you do, the browser blocks API calls with a CORS error.
+5. Supabase, Authentication, URL Configuration: set **Site URL** to the Vercel origin and add it (and `http://localhost:5173` for development) to **Redirect URLs**. Email confirmation links use it.
+6. Gmail (optional): the Google OAuth redirect URI stays the **Render** callback (`GOOGLE_REDIRECT_URL`). After Google, the API sends the browser back to `{FRONTEND_URL}/settings/gmail`.
+
+Preview deployments get their own origin, which is not in `ALLOWED_ORIGINS`, so API calls from a preview URL fail CORS. Use the production URL or add that origin deliberately.
 
 ## Local development against Docker Postgres
 
