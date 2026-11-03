@@ -1,22 +1,22 @@
 -- name: GetDashboardCounts :one
 SELECT
-    COALESCE((SELECT count(*) FROM companies WHERE user_id = sqlc.arg(user_id)), 0)::bigint AS companies,
-    COALESCE((SELECT count(*) FROM jobs WHERE user_id = sqlc.arg(user_id) AND status = 'ACTIVE'), 0)::bigint AS active_jobs,
-    COALESCE((SELECT count(*) FROM contacts WHERE user_id = sqlc.arg(user_id)), 0)::bigint AS contacts,
+    COALESCE((SELECT count(*) FROM companies c WHERE c.user_id = sqlc.arg(user_id)), 0)::bigint AS companies,
+    COALESCE((SELECT count(*) FROM jobs j WHERE j.user_id = sqlc.arg(user_id) AND j.status = 'ACTIVE'), 0)::bigint AS active_jobs,
+    COALESCE((SELECT count(*) FROM contacts ct WHERE ct.user_id = sqlc.arg(user_id)), 0)::bigint AS contacts,
     -- Follow-up eligibility: connection accepted at least the user's delay ago (default 24h)
     -- and no message prepared yet.
-    COALESCE((SELECT count(*) FROM job_contacts
-              WHERE user_id = sqlc.arg(user_id)
-                AND status = 'CONNECTED'
-                AND accepted_at IS NOT NULL
-                AND accepted_at <= now() - make_interval(hours =>
+    COALESCE((SELECT count(*) FROM job_contacts jc
+              WHERE jc.user_id = sqlc.arg(user_id)
+                AND jc.status = 'CONNECTED'
+                AND jc.accepted_at IS NOT NULL
+                AND jc.accepted_at <= now() - make_interval(hours =>
                     COALESCE((SELECT followup_delay_hours FROM application_settings
-                              WHERE user_id = sqlc.arg(user_id)), 24))), 0)::bigint AS followups_due;
+                              WHERE application_settings.user_id = sqlc.arg(user_id)), 24))), 0)::bigint AS followups_due;
 
 -- name: CountJobContactsByStatus :many
 SELECT status, count(*)::bigint AS total
 FROM job_contacts
-WHERE user_id = sqlc.arg(user_id)
+WHERE job_contacts.user_id = sqlc.arg(user_id)
 GROUP BY status;
 
 -- name: ListRecentWorkflowEvents :many
